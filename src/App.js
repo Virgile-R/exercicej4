@@ -1,24 +1,25 @@
-import logo from './logo.svg';
-import './App.css';
 
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import './App.css';
+import AddVacationForm from './components/AddVacationForm/AddVacationForm';
+import EditPayForm from './components/EditPayForm/EditPayForm';
+import NavBar from './components/NavBar/NavBar';
+import UserList from './components/UserList/UserList';
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <BrowserRouter>
+        <NavBar/>
+        <Routes>
+          <Route path='/' element={<UserList />} />
+          <Route path='user/:userId/pay' element={<EditPayForm />} />
+          <Route path='user/:userId/vacations' element={<AddVacationForm />} />
+        </Routes>
+      </BrowserRouter>
+
+    </>
+ 
+
   );
 }
 
