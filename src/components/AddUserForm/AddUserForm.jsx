@@ -9,26 +9,55 @@ export default class addUserForm extends Component {
     this.state = {
       firstName: '',
       lastName: '',
-      grade: '',
+      grade: 'ouvrier',
       adress: '',
-      age: 0,
+      age: 20,
       
     }
   }
   dismissModal = () =>  {
     this.props.toggle()
   }
-  handleSubmit = () => {
+  displaySuccessAlert = () => {
+    this.props.onSuccess()
+    this.props.toggle()
+  }
+  isValidForm = () => {
+
+    if (this.state.firstName.length < 3 || this.state.lastName.length < 3) {
+      console.log('check longueur failed')
+      return false
+    }
+    if (!this.state.firstName.match(/[^0-9]+/g) || !this.state.lastName.match(/[^0-9]+/g)) {
+      console.log('check matchh failed', this.state.firstName.match(/[^0-9]+/g), this.state.lastName.match(/[^0-9]+/g)  )
+      return false
+    }
+    if (this.state.adress.length < 20 || !this.state.adress.match(/.+\s.+\s.*/g)) {
+      console.log('check address failed')
+      return false
+    }
+    if (this.state.age < 20) {
+      console.log('check age failed')
+      return false
+    }
+    return true
+  }
+  handleSubmit = (e) => {
+    e.preventDefault()
     if (this.isValidForm()) {
-      const [firstName, lastName, grade, adress, age] = this.state
+     
       const json = {
-        firstName,
-        lastName,
-        grade,
-        adress,
-        age,
+        firstName: this.state.firstName,
+        lastName: this.state.lastName,
+        grade: this.state.grade,
+        adress: this.state.adress,
+        age: this.state.age,
       }
-      axios.post(`${API_URL}/users`, json).then((response) => {if (response.code === 200) this.setState({addedSuccessfully: true, open: false})} )
+      axios.post(`${API_URL}/users`, json).then((response) => {
+        if (response.status === 201) {
+        
+        this.displaySuccessAlert()
+      }} )
     }
   }
   render() {
@@ -44,12 +73,12 @@ export default class addUserForm extends Component {
                 </button>
               </div>
               <div className='modal-body'></div>
-                <form onSubmit={this.handleSubmit}>
+                <form onSubmit={(e) => this.handleSubmit(e)}>
                   <div className='container form-group'>
                     <label htmlFor='firstName'>Prénom</label>
                     <input className='form-control' required type='text' name='firstName' id='firstName' onChange={(e) => this.setState({firstName: e.target.value})}></input>
                     <label htmlFor='lastName'>Nom</label>
-                    <input className='form-control' required type='text' name='lastName' id='lastName' onChange={(e) => this.setState({firstName: e.target.value})}></input>
+                    <input className='form-control' required type='text' name='lastName' id='lastName' onChange={(e) => this.setState({lastName: e.target.value})}></input>
                     <label htmlFor='grade'>Grade</label>
                     <select className='form-control' name='grade' id='grade' onChange={(e) => this.setState({grade: e.target.value})} required >
                       {GRADES_ARRAY.map((grade, index) => (
@@ -59,7 +88,7 @@ export default class addUserForm extends Component {
                     <label htmlFor='adress'>Adresse</label>
                     <input className='form-control' required name='adress' id='adress' type='text' onChange={(e) => this.setState({adress: e.target.value})} />
                     <label htmlFor='age'>Age</label>
-                    <input className='form-control' required name='age' id='age' type='number' onChange={(e) => this.setState({age: e.target.value})} />
+                    <input className='form-control' required name='age' defaultValue={20} id='age' type='number' onChange={(e) => this.setState({age: e.target.value})} />
                     <button type='submit' className='btn btn-primary my-4'>Ajouter l'employé(e)</button>
                   </div>
                 </form>

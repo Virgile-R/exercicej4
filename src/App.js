@@ -7,7 +7,7 @@ import NavBar from './components/NavBar/NavBar';
 import UserList from './components/UserList/UserList';
 function App() {
   return (
-    <>
+    <div className='container'>
       <BrowserRouter>
         <NavBar/>
         <Routes>
@@ -17,7 +17,7 @@ function App() {
         </Routes>
       </BrowserRouter>
 
-    </>
+    </div>
  
 
   );
