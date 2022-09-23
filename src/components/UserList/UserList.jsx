@@ -1,7 +1,9 @@
 import axios from 'axios'
 import React, { Component } from 'react'
 import { Navigate } from 'react-router-dom'
+import { API_URL } from '../../constants'
 import AddUserForm from '../AddUserForm/AddUserForm'
+import ErrorAlert from '../ErrorAlert/ErrorAlert'
 
 export default class UserList extends Component {
   constructor() {
@@ -10,16 +12,18 @@ export default class UserList extends Component {
       userList: [],
       goToVacationForUser: null,
       goToEditPayForUser: null,
-      showAddUserFormModal: false
+      showAddUserFormModal: false,
+      showErrorAlert: false,
+      showErrorMessage: ''
     }
   }
   componentDidMount() {
-    axios.get('https://632c1fbe5568d3cad87d5f35.mockapi.io/api/v1/users').then((response) => {
+    axios.get(`${API_URL}/users`).then((response) => {
       this.setState({userList: response.data})
     })
   }
   deleteUser(userId) {
-    const url = `https://632c1fbe5568d3cad87d5f35.mockapi.io/api/v1/users/${userId}`
+    const url = `${API_URL}/users/${userId}`
     axios.delete(url).then(() => {
       const updatedUserList = this.state.userList.filter(({id}) => id !== userId)
       this.setState({userList: updatedUserList})
@@ -40,12 +44,18 @@ export default class UserList extends Component {
   toggleSuccessAlert = () => this.setState({
     showSuccessAlert: !this.state.showSuccessAlert
   })
+  toggleErrorAlert = () => this.setState({
+    showErrorAlert: !this.state.showErrorAlert
+  })
   onSuccess = () => {
     
     axios.get('https://632c1fbe5568d3cad87d5f35.mockapi.io/api/v1/users').then((response) => {
       this.setState({userList: response.data})
       this.toggleSuccessAlert()
     })
+  }
+  onError = () => {
+    this.setState({showErrorAlert: true, errorMessage: 'Problème lors de la récupération de votre paie, veuillez rééssayez plus tard.'})
   }
  
   render() {
@@ -58,7 +68,8 @@ export default class UserList extends Component {
             Employé(e) ajouté(e).
             <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close" onClick={this.toggleSuccessAlert}></button>
           </div>}
-        <AddUserForm showModal={this.state.showAddUserFormModal} toggle={this.toggleModal} onSuccess={this.onSuccess}/>
+        {this.state.showErrorAlert && <ErrorAlert toggle={this.toggleErrorAlert} message={this.state.showErrorMessage} />}  
+        <AddUserForm showModal={this.state.showAddUserFormModal} toggle={this.toggleModal} onSuccess={this.onSuccess} onError={this.onError}/>
         <h1>Liste des employé(e)s</h1>
           {this.state.userList.length > 0 ?
             <>
